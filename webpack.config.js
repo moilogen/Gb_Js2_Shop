@@ -1,15 +1,30 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 module.exports = {
+    mode: "production",
+
     entry: {
         main: path.resolve(__dirname, './src/index.js'),
     },
 
     output: {
-      path: path.resolve(__dirname, './public'),
+      path: path.resolve(__dirname, './dist'),
       filename: '[name].bundle.js',
+    },
+
+    module: {
+      rules: [
+        {
+          test: /\.s[ac]ss$/i,
+          use: [
+            MiniCssExtractPlugin.loader,
+            "css-loader",
+            "sass-loader",
+          ],
+        },
+      ],
     },
 
     plugins: [
@@ -18,38 +33,17 @@ module.exports = {
           template: path.resolve(__dirname, './public/template.html'), // шаблон
           filename: 'index.html', // название выходного файла
       }),
-      
-    ],
-
-    devServer: {
-      static: {
-        directory: path.join(__dirname, './public'),
-      },
-      compress: true,
-      port: 9000,
-    },
-
-    module: {
-      rules: [
-        {
-          test: /\.s[ac]ss$/i,
-          use: [
-            // fallback to style-loader in development
-            process.env.NODE_ENV !== "production"
-              ? "style-loader"
-              : MiniCssExtractPlugin.loader,
-            "css-loader",
-            "sass-loader",
-          ],
-        },
-      ],
-    },
-    plugins: [
       new MiniCssExtractPlugin({
-        // Options similar to the same options in webpackOptions.output
-        // both options are optional
         filename: "[name].css",
         chunkFilename: "[id].css",
       }),
     ],
-};
+
+    devServer: {
+      static: {
+        directory: path.join(__dirname, 'dist'),
+      },
+      compress: true,
+      port: 9000,
+    }
+}
